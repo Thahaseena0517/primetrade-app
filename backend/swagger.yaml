@@ -1,0 +1,198 @@
+openapi: 3.0.0
+info:
+  title: Primetrade API
+  description: REST API with Authentication and Task Management
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: john@example.com
+        password:
+          type: string
+          example: "123456"
+
+    Task:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Build REST API
+        description:
+          type: string
+          example: Complete the assignment
+        status:
+          type: string
+          enum: [pending, in-progress, completed]
+          example: pending
+        priority:
+          type: string
+          enum: [low, medium, high]
+          example: medium
+
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        201:
+          description: User registered successfully
+        400:
+          description: Validation error or user already exists
+
+  /auth/login:
+    post:
+      summary: Login user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: john@example.com
+                password:
+                  type: string
+                  example: "123456"
+      responses:
+        200:
+          description: Login successful, returns JWT token
+        401:
+          description: Invalid credentials
+
+  /auth/me:
+    get:
+      summary: Get current logged in user
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Returns user profile
+        401:
+          description: Not authorized
+
+  /auth/users:
+    get:
+      summary: Get all users (admin only)
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Returns list of all users
+        403:
+          description: Not authorized as admin
+
+  /tasks:
+    get:
+      summary: Get all tasks
+      tags: [Tasks]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Returns list of tasks
+        401:
+          description: Not authorized
+
+    post:
+      summary: Create a new task
+      tags: [Tasks]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        201:
+          description: Task created successfully
+        400:
+          description: Validation error
+
+  /tasks/{id}:
+    get:
+      summary: Get single task
+      tags: [Tasks]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns task
+        404:
+          description: Task not found
+
+    put:
+      summary: Update a task
+      tags: [Tasks]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        200:
+          description: Task updated successfully
+        404:
+          description: Task not found
+
+    delete:
+      summary: Delete a task
+      tags: [Tasks]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Task deleted successfully
+        404:
+          description: Task not found
