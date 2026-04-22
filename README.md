@@ -19,9 +19,8 @@ npm run dev
 ```
 
 Create a `.env` file in the backend folder:
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/primetrade
-JWT_SECRET=primetrade_super_secret_jwt_key_2024
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key_here
 JWT_EXPIRE=7d
 NODE_ENV=development
 
